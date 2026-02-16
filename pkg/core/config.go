@@ -4,8 +4,32 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 )
+
+func FindConfigFile() string {
+	locations := []string{}
+
+	if xdg := os.Getenv("XDG_CONFIG_HOME"); xdg != "" {
+		locations = append(locations, filepath.Join(xdg, "tool-iquid", "config.json"))
+	}
+
+	if home, err := os.UserHomeDir(); err == nil {
+		locations = append(locations, filepath.Join(home, ".tool-iquid", "config.json"))
+		locations = append(locations, filepath.Join(home, ".config", "tool-iquid", "config.json"))
+	}
+
+	locations = append(locations, "config.json")
+
+	for _, path := range locations {
+		if _, err := os.Stat(path); err == nil {
+			return path
+		}
+	}
+
+	return ""
+}
 
 type Config struct {
 	RouterURL     string        `json:"router_url"`
