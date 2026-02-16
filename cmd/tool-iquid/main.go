@@ -18,11 +18,16 @@ func main() {
 	checkInterval := flag.Duration("interval", 30*time.Second, "Internet check interval")
 	dryRun := flag.Bool("dry-run", false, "Perform checks and login but do not reboot")
 	force := flag.Bool("force", false, "Force login check even if internet is online")
-	configFile := flag.String("config", "config.json", "Path to configuration file")
+	configFile := flag.String("config", "", "Path to configuration file (default: ~/.tool-iquid/config.json or XDG)")
 
 	flag.Parse()
 
-	cfg, err := core.LoadConfig(*configFile)
+	configPath := *configFile
+	if configPath == "" {
+		configPath = core.FindConfigFile()
+	}
+
+	cfg, err := core.LoadConfig(configPath)
 	if err == nil {
 		if *routerURL == "http://192.168.1.254" && cfg.RouterURL != "" {
 			*routerURL = cfg.RouterURL
@@ -57,7 +62,7 @@ func main() {
 			time.Sleep(*checkInterval)
 			continue
 		} else {
-			utils.LogInfo("Connected to ", ssid)
+			utils.LogInfo("Connected to %s", ssid)
 		}
 
 		online := core.CheckConnectivity()
@@ -67,24 +72,50 @@ func main() {
 			utils.LogWarn("Internet is OFFLINE")
 		}
 
-		if !online || *force {
+		if !online || *force || *dryRun {
 			if *force && online {
 				utils.LogWarn("Force mode enabled. Initiating recovery check...")
 			} else {
 				utils.LogWarn("Initiating recovery sequence...")
 			}
 
-			timeout := 30 * time.Second
-			if cfg != nil && cfg.Timeout > 0 {
-				timeout = cfg.Timeout
+			cooldownVal := 5 * time.Minute
+			if cfg != nil && cfg.Cooldown > 0 {
+				cooldownVal = cfg.Cooldown
 			}
 
-			client := liquid.NewClient(*routerURL, *username, *password, timeout)
+			timeoutVal := 30 * time.Second
+			if cfg != nil && cfg.Timeout > 0 {
+				timeoutVal = cfg.Timeout
+			}
+
+			client := liquid.NewClient(*routerURL, *username, *password, timeoutVal)
 
 			if *dryRun {
 				utils.LogInfo("[Dry-Run] Would try to login and reboot now.")
-				// if err := client
+				if err := client.Login(); err != nil {
+					utils.LogError("[Dry-Run] Login check failed: %v", err)
+				} else {
+					utils.LogSuccess("[Dry-Run] Login check successful!")
+				}
+			} else {
+				utils.LogInfo("Logging in...")
+				if err := client.Login(); err != nil {
+					utils.LogError("Login failed: %v", err)
+					time.Sleep(*checkInterval)
+					continue
+				}
+
+				utils.LogSuccess("Login successful. Attempting reboot...")
+				if err := client.Reboot(); err != nil {
+					utils.LogError("Reboot failed: %v", err)
+				} else {
+					utils.LogSuccess("Reboot triggered successfully! Waiting %d minutes for restart...", cooldownVal)
+					time.Sleep(cooldownVal)
+				}
 			}
 		}
+
+		time.Sleep(*checkInterval)
 	}
 }
