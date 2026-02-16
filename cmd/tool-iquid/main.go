@@ -13,7 +13,7 @@ func main() {
 	routerURL := flag.String("url", "http://192.168.1.254", "Router URL")
 	username := flag.String("user", "", "Router Username")
 	password := flag.String("pass", "", "Router Password")
-	targetSSID := flag.String("ssid", "WiFi - The House", "Target SSID to watch")
+	targetSSID := flag.String("ssid", "Target_SSID_Name", "Target SSID to watch")
 	cooldown := flag.Duration("cooldown", 5*time.Minute, "Cooldown time after reboot")
 	checkInterval := flag.Duration("interval", 30*time.Second, "Internet check interval")
 	dryRun := flag.Bool("dry-run", false, "Perform checks and login but do not reboot")
@@ -38,7 +38,7 @@ func main() {
 		if *password == "" && cfg.Password != "" {
 			*password = cfg.Password
 		}
-		if *targetSSID == "WiFi - The House" && cfg.TargetSSID != "" {
+		if *targetSSID == "Target_SSID_Name" && cfg.TargetSSID != "" {
 			*targetSSID = cfg.TargetSSID
 		}
 		if *cooldown == 5*time.Minute && cfg.Cooldown != 0 {

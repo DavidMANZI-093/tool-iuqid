@@ -56,7 +56,7 @@ func LoadConfig(path string) (*Config, error) {
 		config.RouterURL = "http://192.168.1.254"
 	}
 	if config.TargetSSID == "" {
-		config.TargetSSID = "WiFi - The House"
+		config.TargetSSID = "Target_SSID_Name"
 	}
 	if config.Cooldown == 0 {
 		config.Cooldown = 5 * time.Minute
