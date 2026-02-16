@@ -5,7 +5,8 @@ import (
 	"time"
 
 	"github.com/DavidMANZI-093/tool-iquid/pkg/core"
-	logger "github.com/DavidMANZI-093/tool-iquid/pkg/utils"
+	"github.com/DavidMANZI-093/tool-iquid/pkg/liquid"
+	"github.com/DavidMANZI-093/tool-iquid/pkg/utils"
 )
 
 func main() {
@@ -43,34 +44,34 @@ func main() {
 		}
 	}
 
-	logger.Info("Starting tool-iquid. Watching SSID: %s", *targetSSID)
+	utils.LogInfo("Starting tool-iquid. Watching SSID: %s", *targetSSID)
 
 	for {
 		ssid, err := core.GetCurrentSSID()
 		if err != nil {
-			logger.Warn("Error getting SSID: %v", err)
+			utils.LogWarn("Error getting SSID: %v", err)
 			time.Sleep(5 * time.Second)
 			continue
 		} else if ssid != *targetSSID {
-			logger.Warn("Not connected to target SSID (Current: %s). Waiting...", ssid)
+			utils.LogWarn("Not connected to target SSID (Current: %s). Waiting...", ssid)
 			time.Sleep(*checkInterval)
 			continue
 		} else {
-			logger.Info("Connected to ", ssid)
+			utils.LogInfo("Connected to ", ssid)
 		}
 
 		online := core.CheckConnectivity()
 		if online {
-			logger.Success("Internet is ONLINE")
+			utils.LogSuccess("Internet is ONLINE")
 		} else {
-			logger.Warn("Internet is OFFLINE")
+			utils.LogWarn("Internet is OFFLINE")
 		}
 
 		if !online || *force {
 			if *force && online {
-				logger.Warn("Force mode enabled. Initiating recovery check...")
+				utils.LogWarn("Force mode enabled. Initiating recovery check...")
 			} else {
-				logger.Warn("Initiating recovery sequence...")
+				utils.LogWarn("Initiating recovery sequence...")
 			}
 
 			timeout := 30 * time.Second
@@ -78,7 +79,12 @@ func main() {
 				timeout = cfg.Timeout
 			}
 
-			// TODO: Continnue
+			client := liquid.NewClient(*routerURL, *username, *password, timeout)
+
+			if *dryRun {
+				utils.LogInfo("[Dry-Run] Would try to login and reboot now.")
+				// if err := client
+			}
 		}
 	}
 }
