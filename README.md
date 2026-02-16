@@ -4,7 +4,7 @@
 
 ---
 
-### 📖 The Story
+### The Story
 
 #### The 7-Minute Itch
 
@@ -44,7 +44,7 @@ I had fun. I had thrills. I had twists. And now, I have a fairly reliable intern
 
 ---
 
-### 🛠️ What It Does
+### What It Does
 
 **tool-iquid** is a daemon that:
 
@@ -54,7 +54,7 @@ I had fun. I had thrills. I had twists. And now, I have a fairly reliable intern
 4. **Triggers** a reboot if connectivity is lost.
 5. **Waits** through the 7-minute initialization period before checking again.
 
-### 🚀 Getting Started
+### Getting Started
 
 #### Installation
 
@@ -75,7 +75,7 @@ Run it with your config:
 For full details on configuration, systemd setup, and command-line flags, see the **[User Manual](docs/manual.md)**.
 For the nerdy details on how we cracked the encryption, read **[The Reverse Engineering Docs](docs/encryption_reverse_engineering.md)**.
 
-### 📜 License
+### License
 
 Unlicense. A piece of my life given to the world.
 
