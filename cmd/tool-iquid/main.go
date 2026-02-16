@@ -110,7 +110,7 @@ func main() {
 				if err := client.Reboot(); err != nil {
 					utils.LogError("Reboot failed: %v", err)
 				} else {
-					utils.LogSuccess("Reboot triggered successfully! Waiting %d minutes for restart...", cooldownVal)
+					utils.LogSuccess("Reboot triggered successfully! Waiting %d minutes for restart...", cooldownVal/time.Minute)
 					time.Sleep(cooldownVal)
 				}
 			}
