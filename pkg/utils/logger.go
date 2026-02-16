@@ -30,5 +30,5 @@ func LogError(format string, v ...interface{}) {
 }
 
 func LogDebug(format string, v ...interface{}) {
-	log.Printf(colorMagenta+"(error) "+colorReset+format, v...)
+	log.Printf(colorMagenta+"(debug) "+colorReset+format, v...)
 }
